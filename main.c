@@ -2,6 +2,37 @@
 #include <stdlib.h>
 #include <GLFW/glfw3.h>
 
+#include "linmath.h"
+
+ GLuint vertex_buffer, vertex_shader, fragment_shader, program;
+    GLint mvp_location, vpos_location;
+
+static const vec2 vertices[4] =
+{
+    { -0.6f, -0.6f },
+    {  0.6f, -0.6f },
+    {  0.6f,  0.6f },
+    { -0.6f,  0.6f }
+};
+
+
+static const char* vertex_shader_text =
+"#version 110\n"
+"uniform mat4 MVP;\n"
+"attribute vec2 vPos;\n"
+"void main()\n"
+"{\n"
+"    gl_Position = MVP * vec4(vPos, 0.0, 1.0);\n"
+"}\n";
+
+static const char* fragment_shader_text =
+"#version 110\n"
+"void main()\n"
+"{\n"
+"    gl_FragColor = vec4(1.0);\n"
+"}\n";
+
+
 double gFrameCount=0;
 void showFPS(double *gStartTimeFPS) {
 	double currentTime=glfwGetTime();
@@ -14,17 +45,33 @@ void showFPS(double *gStartTimeFPS) {
 	}
 }
 void init() {
+
+
+  glGenBuffers(1, &vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
+    glCompileShader(vertex_shader);
+
+    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
+    glCompileShader(fragment_shader);
+
+    program = glCreateProgram();
+    glAttachShader(program, vertex_shader);
+    glAttachShader(program, fragment_shader);
+    glLinkProgram(program);
+
+    mvp_location = glGetUniformLocation(program, "MVP");
+    vpos_location = glGetAttribLocation(program, "vPos");
+
+    glEnableVertexAttribArray(vpos_location);
+    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
+                          sizeof(vertices[0]), (void*) 0);
 }
-void update() {
-}
-void render() {
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClearColor(0.4,0.4,1.0,1.0);
-}
-void mainLoop() {
-	update();
-	render();
-}
+
 static void error_callback(int error, const char* description)
 {
 	printf("%s\n", description);
@@ -37,6 +84,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 int main(void)
 {
 	GLFWwindow* window;
+
+
 
 	GLFWrect rects[8] =
 	{{ 250,  25, 350,  90},
@@ -55,6 +104,7 @@ int main(void)
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
 
+    glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint( GLFW_CLIENT_API, GLFW_OPENGL_ES_API );
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 2 );
 
@@ -65,6 +115,7 @@ int main(void)
 		exit(1);
 	}
 	glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
 
 
 	double gStartTimeFPS=glfwGetTime();
@@ -78,20 +129,50 @@ int main(void)
 	glfwSetKeyCallback(window, key_callback);
 	init();
 
+
+
 	while (!glfwWindowShouldClose(window))
 	{
 		float ratio;
 		int width, height;
 		int buffer_age;
 
+        mat4x4 m, p, mvp;
+
+        const double angle = glfwGetTime() * M_PI / 180.0;
+
 		glfwGetFramebufferSize(window, &width, &height);
 
 		buffer_age = glfwGetBufferAge(window);
 
-		ratio = width / (float) height;
-		glViewport(0, 0, width, height);
+ ratio = width / (float) height;
 
-		mainLoop();
+		ratio = width / (float) height;
+	 glViewport(0, 0, width, height);
+        glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.4,0.4,1.0,1.0);
+
+        glUseProgram(program);
+
+        mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 0.f, 1.f);
+
+        mat4x4_translate(m, -1.f, 0.f, 0.f);
+        mat4x4_rotate_Z(m, m, (float) angle);
+        mat4x4_mul(mvp, p, m);
+
+        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
+        glDisable(GL_MULTISAMPLE);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+        mat4x4_translate(m, 1.f, 0.f, 0.f);
+        mat4x4_rotate_Z(m, m, (float) angle);
+        mat4x4_mul(mvp, p, m);
+
+        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
+        glEnable(GL_MULTISAMPLE);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+		//mainLoop();
 		showFPS(&gStartTimeFPS);
 
 		if (buffer_age > 0)
