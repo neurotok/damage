@@ -104,8 +104,10 @@ int main(void)
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
 
+
     glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint( GLFW_CLIENT_API, GLFW_OPENGL_ES_API );
+	glfwWindowHint( GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API );
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 2 );
 
 	window = glfwCreateWindow(800, 400, "Window Title", NULL, NULL);
