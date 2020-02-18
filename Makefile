@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -lm -lGL -lGLU -lGLEW -lglfw -lX11 -lXxf86vm -lXrandr -lpthread -lXi -ldl
+CFLAGS=-Wall -lm -lGLESv2 -lglfw -ldl -lX11 -lpthread
 
 HEADER = -I./include
 LIBB = ./lib/libglfw3.a
@@ -12,4 +12,4 @@ damage: main.o
 main.o: main.c
 	$(CC) -c main.c $(HEADER)
 clean:
-	rm -rf *o  ./damage
+	rm -rf *o damage
