@@ -1,18 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <GLES2/gl2.h>
 #include <GLFW/glfw3.h>
 
 #include "linmath.h"
 
- GLuint vertex_buffer, vertex_shader, fragment_shader, program;
-    GLint mvp_location, vpos_location;
+GLuint vertex_buffer, vertex_shader, fragment_shader, program;
+GLint mvp_location, vpos_location;
 
 static const vec2 vertices[4] =
 {
-    { -0.6f, -0.6f },
-    {  0.6f, -0.6f },
-    {  0.6f,  0.6f },
-    { -0.6f,  0.6f }
+	{ -0.6f, -0.6f },
+	{  0.6f, -0.6f },
+	{  0.6f,  0.6f },
+	{ -0.6f,  0.6f }
 };
 
 
@@ -47,29 +48,29 @@ void showFPS(double *gStartTimeFPS) {
 void init() {
 
 
-  glGenBuffers(1, &vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glGenBuffers(1, &vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
-    glCompileShader(vertex_shader);
+	vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
+	glCompileShader(vertex_shader);
 
-    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
-    glCompileShader(fragment_shader);
+	fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
+	glCompileShader(fragment_shader);
 
-    program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
+	program = glCreateProgram();
+	glAttachShader(program, vertex_shader);
+	glAttachShader(program, fragment_shader);
+	glLinkProgram(program);
 
-    mvp_location = glGetUniformLocation(program, "MVP");
-    vpos_location = glGetAttribLocation(program, "vPos");
+	mvp_location = glGetUniformLocation(program, "MVP");
+	vpos_location = glGetAttribLocation(program, "vPos");
 
-    glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(vertices[0]), (void*) 0);
+	glEnableVertexAttribArray(vpos_location);
+	glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
+			sizeof(vertices[0]), (void*) 0);
 }
 
 static void error_callback(int error, const char* description)
@@ -88,15 +89,7 @@ int main(void)
 
 
 	GLFWrect rects[8] =
-	{{ 250,  25, 350,  90},
-		{ 250, 285, 350,  90},
-		{ 250, 115,  90, 170},
-		{285, 115,  90, 170},
-
-		{425,  25, 350,  90},
-		{425, 285, 350,  90},
-		{425, 115,  90, 170},
-		{685, 115,  90, 170},
+	{{ 0,  0, 400,  400}
 	};
 
 
@@ -105,7 +98,7 @@ int main(void)
 		exit(EXIT_FAILURE);
 
 
-    glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint( GLFW_CLIENT_API, GLFW_OPENGL_ES_API );
 	glfwWindowHint( GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API );
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 2 );
@@ -117,7 +110,7 @@ int main(void)
 		exit(1);
 	}
 	glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+	glfwSwapInterval(1);
 
 
 	double gStartTimeFPS=glfwGetTime();
@@ -139,46 +132,38 @@ int main(void)
 		int width, height;
 		int buffer_age;
 
-        mat4x4 m, p, mvp;
+		mat4x4 m, p, mvp;
 
-        const double angle = glfwGetTime() * M_PI / 180.0;
+		const double angle = glfwGetTime() * M_PI / 180.0;
 
 		glfwGetFramebufferSize(window, &width, &height);
 
 		buffer_age = glfwGetBufferAge(window);
 
- ratio = width / (float) height;
 
 		ratio = width / (float) height;
-	 glViewport(0, 0, width, height);
-        glClear(GL_COLOR_BUFFER_BIT);
-	glClearColor(0.4,0.4,1.0,1.0);
 
-        glUseProgram(program);
+		ratio = width / (float) height;
+		glViewport(0, 0, width, height);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0.4,0.4,1.0,1.0);
 
-        mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 0.f, 1.f);
+		glUseProgram(program);
 
-        mat4x4_translate(m, -1.f, 0.f, 0.f);
-        mat4x4_rotate_Z(m, m, (float) angle);
-        mat4x4_mul(mvp, p, m);
+		mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 0.f, 1.f);
 
-        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
-        glDisable(GL_MULTISAMPLE);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		mat4x4_translate(m, 0.f, 0.f, 0.f);
+		mat4x4_rotate_Z(m, m, (float) angle);
+		mat4x4_mul(mvp, p, m);
 
-        mat4x4_translate(m, 1.f, 0.f, 0.f);
-        mat4x4_rotate_Z(m, m, (float) angle);
-        mat4x4_mul(mvp, p, m);
+		glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
+		glDisable(GL_MULTISAMPLE);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
-        glEnable(GL_MULTISAMPLE);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-
-		//mainLoop();
 		showFPS(&gStartTimeFPS);
 
 		if (buffer_age > 0)
-			glfwSwapBuffersWithDamage(window, rects, 8);
+			glfwSwapBuffersWithDamage(window, rects, 1);
 		else
 			glfwSwapBuffers(window);
 		glfwPollEvents();

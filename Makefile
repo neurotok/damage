@@ -12,4 +12,4 @@ damage: main.o
 main.o: main.c
 	$(CC) -c main.c $(HEADER)
 clean:
-	rm -rf *o damage
+	rm -rf *o  ./damage
