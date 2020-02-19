@@ -72,7 +72,7 @@ void init() {
 	GL(program = glCreateProgram());
 	glAttachShader(program, vertex_shader);
 	glAttachShader(program, fragment_shader);
-	glLinkProgram(program);
+	GL(glLinkProgram(program));
 
 	mvp_location = glGetUniformLocation(program, "MVP");
 	vpos_location = glGetAttribLocation(program, "vPos");
