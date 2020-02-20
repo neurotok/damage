@@ -8,7 +8,7 @@ solution "damage"
 		language "C"
 		targetdir("build")
 		files { "main.c" }
-		includedirs { "include" }
+		includedirs { "glfw/include" }
 		libdirs("lib")
 		links { "glfw3" }
 
