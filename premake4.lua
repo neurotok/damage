@@ -13,7 +13,8 @@ solution "damage"
 		links { "glfw3" }
 
 		configuration { "linux" }
-			links {"m", "GLESv2", "dl", "X11", "pthread" }
+			defines { "_GLFW_WIN32" }
+			links {"m", "GLESv2", "dl", "X11", "pthread" }:wq
 
 		configuration "Debug"
 			defines { "DEBUG" }
