@@ -1,10 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+
+#ifndef __WIN32
+#include <windows.h>
+#endif
+
 #include <GLES2/gl2.h>
 #include <GLFW/glfw3.h>
 
 #include "linmath.h"
+
+#ifndef M_PI
+#define M_PI   3.14159265358979323846264338327950288
+#endif
+
+#ifndef GL_MULTISAMPLE
+#define GL_MULTISAMPLE  0x809D
+#endif
+
+
 
 #ifdef DEBUG
 #  define GL(line) do {                      \
@@ -91,7 +106,13 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 }
-int main(void)
+
+#ifndef __WIN32
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst,
+	LPSTR lpszCmdLine, int nShowCmd)
+#else
+int main(int argc, char const *argv[])
+#endif
 {
 	GLFWwindow* window;
 
