@@ -1,24 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-
 #ifndef __WIN32
 #include <windows.h>
 #endif
 
-#include <GLES2/gl2.h>
+#include <glad/glad.h>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "linmath.h"
-
-#ifndef M_PI
-#define M_PI   3.14159265358979323846264338327950288
+#if defined(_MSC_VER)
+#define _USE_MATH_DEFINES
 #endif
+
+#include "linmath.h"
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D
 #endif
-
 
 
 #ifdef DEBUG
@@ -125,11 +124,13 @@ int main(int argc, char const *argv[])
 		exit(EXIT_FAILURE);
 
 
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	
 	glfwWindowHint( GLFW_CLIENT_API, GLFW_OPENGL_ES_API );
-	glfwWindowHint( GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API );
-	glfwWindowHint( GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API );
+	//glfwWindowHint( GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API );
+	//glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 2 );
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	window = glfwCreateWindow(800, 400, "Window Title", NULL, NULL);
 	if (!window)
@@ -140,6 +141,11 @@ int main(int argc, char const *argv[])
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1);
 
+	if (!gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress))
+	{
+		printf("Failed to initialize OpenglES2 context\n");
+		return -1;
+	}
 
 	double gStartTimeFPS=glfwGetTime();
 
@@ -194,6 +200,8 @@ int main(int argc, char const *argv[])
 			glfwSwapBuffersWithDamage(window, rects, 1);
 		else
 			glfwSwapBuffers(window);
+
+
 		glfwPollEvents();
 
 

@@ -3,7 +3,6 @@ workspace "damage"
 	configurations { "Debug", "Release" }
 	location ( "build" )
 	
-	--system { "Windows", "Unix" }
 	platforms {"native", "x32"}
 	
 	project "damage"
@@ -11,13 +10,13 @@ workspace "damage"
 		kind "WindowedApp"
 		language "C"
 		targetdir("build")
-		files { "main.c" }
+		files { "src/main.c" , "src/glad.c"}
 		includedirs {"include"}
 
 		filter "system:Windows"
 			system "windows"
 			libdirs("lib/Debug_Win32")
-			links { "glfw3dll", "libGLESv2", "libEGL", "OpenGL32"}
+			links { "glfw3dll", "libGLESv2", "libEGL"}
 
 		filter "system:Unix"
 			system "linux"
